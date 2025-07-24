@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- titulo de pagina -->
+  <title>Geoportal</title>
+
+  <link rel="preconnect" href="https://fonts.bunny.net" />
+  <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+
+  <!-- Estilos -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+  <!-- Librerias iniciales -->
+  <script src="js/jquery-3.6.0.js"></script>
+  <script src="js/componentes.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+ 
+  <!-- Estilos propios -->
+  <link rel="stylesheet" href="css/geoportal.css" />
+
+</head>
+
+<body class="font-sans antialiased" style="background-color: #dfdfdf !important">
+
+  
+  <!-- Pantalla trasera -->
+  <div class="position-absolute w-100" style="min-height: 40vh; background-color: #599d8a"></div>
+
+  <!-- Contenido principal -->
+  <main class="main-content position-relative">
+
+    <!-- Header - titulo -->
+    <header class="p-4">
+      <div class="container-fluid d-flex flex-wrap justify-content-center">
+        <h4>
+          <span class="fs-4 text-white">
+            <b>Geoportal Turistico del Ecuador</b></span>
+        </h4>
+      </div>
+    </header>
+
+    <!-- Contenedor de mapa -->
+    <div class="container-fluid mt-1">
+      <div class="row">
+        <div class="col-lg-12" id="columna-mapa">
+          <div class="card z-index-0" style="height: 90vh; width: 100%; border-radius: 25px" id="card-mapa">
+            <div class="card-body" id="map"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de informacion -->
+    <div class="modal fade" id="modal-info" tabindex="-1" aria-labelledby="modal-info-label" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modal-info-label"></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body" id="modal-info-body"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Boton de apertura de menu lateral -->
+  <button class="btn btn-bd-primary py-2 position-fixed bottom-0 end-0 mb-4 me-4 d-flex align-items-center" style="
+        background: #599d8a !important;
+        z-index: 2;
+        color: white;
+        border: 1px solid lightgrey;
+      " type="button" aria-expanded="false" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling"
+    aria-controls="offcanvasScrolling">
+    <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" fill="currentColor" class="bi bi-filter"
+      viewBox="0 0 16 16">
+      <path
+        d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5" />
+    </svg>
+  </button>
+
+  <!-- Menu lateral -->
+  <div class="offcanvas offcanvas-end show" data-bs-scroll="false" data-bs-backdrop="false" tabindex="-1"
+    id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel"
+    style="margin: 0.5rem; border-radius: 25px; background: #f8f9fa">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="offcanvasScrollingLabel">Filtros</h5>
+      <button type="button" class="btn-close btn-close-filter" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <div class="flex-shrink-0 p-3">
+        <a class="d-flex align-items-center pb-3 mb-3 link-body-emphasis text-decoration-none border-bottom"
+          data-bs-toggle="collapse" data-bs-target="#capas-collapse" aria-expanded="true">
+          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="16" fill="currentColor" class="bi bi-stack"
+            viewBox="0 0 16 16">
+            <path
+              d="m14.12 10.163 1.715.858c.22.11.22.424 0 .534L8.267 15.34a.6.6 0 0 1-.534 0L.165 11.555a.299.299 0 0 1 0-.534l1.716-.858 5.317 2.659c.505.252 1.1.252 1.604 0l5.317-2.66zM7.733.063a.6.6 0 0 1 .534 0l7.568 3.784a.3.3 0 0 1 0 .535L8.267 8.165a.6.6 0 0 1-.534 0L.165 4.382a.299.299 0 0 1 0-.535z" />
+            <path
+              d="m14.12 6.576 1.715.858c.22.11.22.424 0 .534l-7.568 3.784a.6.6 0 0 1-.534 0L.165 7.968a.299.299 0 0 1 0-.534l1.716-.858 5.317 2.659c.505.252 1.1.252 1.604 0z" />
+          </svg>
+          <span class="fs-5 fw-semibold">Capas</span>
+        </a>
+        <div class="collapse show" id="capas-collapse">
+          <div style="margin-left: 1rem !important" id="elementos-capas">
+            <div class="form-check form-switch mb-2">
+              <input class="form-check-input capas_elemento" type="checkbox" role="switch" id="capa_conservacion" />
+              <label class="form-check-label" for="capas_elemento">Conservación</label>
+            </div>
+            <div style="padding: 1rem; display: none" id="grupo-opacidad-conservacion">
+              <label for="opacity-range">Opacidad:</label>
+              <input class="ml-2" type="range" id="opacity-range-conservacion" min="0" max="1" step="0.1" value="0.5" />
+              <span id="opacity-value-conservacion">0.5</span>
+            </div>
+
+            <div class="form-check form-switch mb-2">
+              <input class="form-check-input capas_elemento" type="checkbox" role="switch" id="capa_corredor" />
+              <label class="form-check-label" for="capas_elemento">Corredor</label>
+            </div>
+            <div style="padding: 1rem; display: none" id="grupo-opacidad-corredor">
+              <label for="opacity-range">Opacidad:</label>
+              <input class="ml-2" type="range" id="opacity-range-corredor" min="0" max="1" step="0.1" value="0.5" />
+              <span id="opacity-value-corredor">0.5</span>
+            </div>
+
+            <div class="form-check form-switch mb-2">
+              <input class="form-check-input capas_elemento" type="checkbox" role="switch" id="capa_humedales" />
+              <label class="form-check-label" for="capas_elemento">Humedales</label>
+            </div>
+            <div style="padding: 1rem; display: none" id="grupo-opacidad-humedales">
+              <label for="opacity-range">Opacidad:</label>
+              <input class="ml-2" type="range" id="opacity-range-humedales" min="0" max="1" step="0.1" value="0.5" />
+              <span id="opacity-value-humedales">0.5</span>
+            </div>
+
+            <div class="form-check form-switch mb-2">
+              <input class="form-check-input capas_elemento" type="checkbox" role="switch" id="capa_snap" />
+              <label class="form-check-label" for="capas_elemento">Snap</label>
+            </div>
+            <div style="padding: 1rem; display: none" id="grupo-opacidad-snap">
+              <label for="opacity-range">Opacidad:</label>
+              <input class="ml-2" type="range" id="opacity-range-snap" min="0" max="1" step="0.1" value="0.5" />
+              <span id="opacity-value-snap">0.5</span>
+            </div>
+          </div>
+        </div>
+
+        <a class="d-flex align-items-center pb-3 mb-3 link-body-emphasis text-decoration-none border-bottom"
+          data-bs-toggle="collapse" data-bs-target="#puntos-collapse" aria-expanded="true">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-airplane-fill"
+            viewBox="0 0 16 16">
+            <path
+              d="M6.428 1.151C6.708.591 7.213 0 8 0s1.292.592 1.572 1.151C9.861 1.73 10 2.431 10 3v3.691l5.17 2.585a1.5 1.5 0 0 1 .83 1.342V12a.5.5 0 0 1-.582.493l-5.507-.918-.375 2.253 1.318 1.318A.5.5 0 0 1 10.5 16h-5a.5.5 0 0 1-.354-.854l1.319-1.318-.376-2.253-5.507.918A.5.5 0 0 1 0 12v-1.382a1.5 1.5 0 0 1 .83-1.342L6 6.691V3c0-.568.14-1.271.428-1.849" />
+          </svg>
+          <span class="fs-5 fw-semibold">Turismo</span>
+        </a>
+        <div class="collapse show" id="puntos-collapse">
+          <div class="mb-3">
+            <label for="exampleFormControlInput1" class="form-label small">Provincias</label>
+            <select class="form-select w-100" name="filtro_provincias" id="filtro_provincias"></select>
+          </div>
+          <div class="mb-3">
+            <label for="exampleFormControlInput1" class="form-label small">Cantones</label>
+            <select class="form-select w-100" name="filtro_cantones" id="filtro_cantones"></select>
+          </div>
+          <div class="mb-3">
+            <label for="exampleFormControlInput1" class="form-label small">Parroquias</label>
+            <select class="form-select w-100" name="filtro_parroquias" id="filtro_parroquias"></select>
+          </div>
+          <div class="mb-3">
+            <button type="button" class="btn btn-success w-100 btn-graficar-turismo" style="border-radius: 25px">
+              Graficar
+            </button>
+          </div>
+
+          <div class="mb-3">
+            <!-- Button trigger modal -->
+              <button type="button" class="btn btn-primary w-100 btn-sitio-turismo" style="border-radius: 25px" data-bs-toggle="modal" data-bs-target="#sitio-turistico" >
+                Añadir sitio turistico
+              </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="sitio-turistico" tabindex="-1" aria-labelledby="sitio-turisticoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="sitio-turisticoLabel">Nuevo sitio turistico</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="nombre_sitio" class="form-label">Nombre sitio turistico</label>
+            <input type="email" class="form-control" id="nombre_sitio" placeholder="name@example.com">
+          </div>
+          <div class="mb-3">
+            <label for="descripcion_sitio" class="form-label">Descripcion</label>
+            <textarea class="form-control" id="descripcion_sitio" rows="3"></textarea>
+          </div>
+          <div class="row">
+            <div class="col">
+              <label for="nombre_sitio" class="form-label">Longitud</label>
+              <input type="email" class="form-control" id="longitud_sitio" placeholder="xxxxxxx" disabled>
+            </div>
+            <div class="col">
+              <label for="nombre_sitio" class="form-label">Latitud</label>
+              <input type="email" class="form-control" id="latitud_sitio" placeholder="xxxxxx" disabled>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary btn-registro-sitio-turismo">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Librerias -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.browser.print/dist/leaflet.browser.print.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- Logica propia -->
+  <script src="js/geoportal.js"></script>
+
+</body>
+
+</html>
